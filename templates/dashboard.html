@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<h1 class="heading">My Auctions</h1>
+<h1 class="title">My Auctions</h1>
 
 {% for item in my_items %}
 <div class="card">
@@ -12,14 +12,16 @@
     <h2>{{ item.title }}</h2>
 
     <p>Status: {{ item.status }}</p>
-
     <p>Highest Bid: ₹{{ item.highest_bid }}</p>
-
     <p>Highest Bidder: {{ item.highest_bidder }}</p>
 
     <a href="/auction/{{ item.id }}" class="btn">View</a>
 
 </div>
 {% endfor %}
+
+{% if my_items|length == 0 %}
+<p>You have not posted any items yet.</p>
+{% endif %}
 
 {% endblock %}
