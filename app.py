@@ -4,6 +4,7 @@ from flask_login import LoginManager, UserMixin, login_user, logout_user, login_
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 import os
 
 app = Flask(__name__)
@@ -11,6 +12,8 @@ app.config["SECRET_KEY"] = "secretkey123"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///auction.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["UPLOAD_FOLDER"] = "static/uploads"
+
+IST = ZoneInfo("Asia/Kolkata")
 
 db = SQLAlchemy(app)
 
@@ -41,11 +44,13 @@ def load_user(user_id):
     return db.session.get(User, int(user_id))
 
 def update_status():
-    now = datetime.now()
+    now = datetime.now(IST)
     items = Auction.query.filter_by(status="Active").all()
+
     for item in items:
         if now >= item.end_time:
             item.status = "Ended"
+
     db.session.commit()
 
 with app.app_context():
@@ -127,7 +132,7 @@ def add_item():
             highest_bid=price,
             highest_bidder="No bids",
             seller=current_user.username,
-            end_time=datetime.now() + timedelta(minutes=minutes)
+            end_time=datetime.now(IST) + timedelta(minutes=minutes)
         )
 
         db.session.add(item)
@@ -170,6 +175,7 @@ def extend(item_id):
 
     if item.seller == current_user.username and item.extended == False and item.status == "Active":
         item.end_time = item.end_time + timedelta(minutes=5)
+        db.session.commit()
         item.extended = True
         db.session.commit()
         flash("Auction extended by 5 minutes")
