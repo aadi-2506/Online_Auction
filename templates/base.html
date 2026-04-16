@@ -3,6 +3,7 @@
 <head>
     <title>Online Auction System</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
 
@@ -16,7 +17,7 @@
             <a href="/dashboard">Dashboard</a>
             <a href="/add_item">Sell Item</a>
             <a href="/logout">Logout</a>
-            <span class="user">Hello {{ current_user.username }}</span>
+            <span class="user">Hi {{ current_user.username }}</span>
         {% else %}
             <a href="/login">Login</a>
             <a href="/register">Register</a>
