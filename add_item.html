@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="form-box">
+<h1>Post Item for Auction</h1>
+
+<form method="POST" enctype="multipart/form-data">
+
+    <input type="text" name="title" placeholder="Item Name" required>
+
+    <textarea name="description" placeholder="Description" required></textarea>
+
+    <input type="number" step="0.01" name="price" placeholder="Starting Price" required>
+
+    <input type="number" name="minutes" placeholder="Auction Time (minutes)" required>
+
+    <input type="file" name="image" accept="image/*" required>
+
+    <button type="submit">Post Item</button>
+
+</form>
+</div>
+
+{% endblock %}

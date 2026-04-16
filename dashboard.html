@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1 class="heading">My Auctions</h1>
+
+{% for item in my_items %}
+<div class="card">
+
+    <img src="{{ url_for('static', filename='uploads/' + item.image) }}" class="photo">
+
+    <h2>{{ item.title }}</h2>
+
+    <p>Status: {{ item.status }}</p>
+
+    <p>Highest Bid: ₹{{ item.highest_bid }}</p>
+
+    <p>Highest Bidder: {{ item.highest_bidder }}</p>
+
+    <a href="/auction/{{ item.id }}" class="btn">View</a>
+
+</div>
+{% endfor %}
+
+{% endblock %}

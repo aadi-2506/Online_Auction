@@ -1,0 +1,98 @@
+body{
+    margin:0;
+    font-family:Arial;
+    background:#f1f3f6;
+}
+
+nav{
+    background:#111;
+    color:white;
+    padding:15px 30px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.logo{
+    font-size:24px;
+    font-weight:bold;
+}
+
+.links a{
+    color:white;
+    text-decoration:none;
+    margin-left:15px;
+}
+
+.user{
+    color:#00ff99;
+    margin-left:15px;
+}
+
+.container{
+    width:85%;
+    margin:auto;
+    margin-top:30px;
+}
+
+.heading{
+    text-align:center;
+    margin-bottom:25px;
+}
+
+.card{
+    background:white;
+    padding:20px;
+    margin-bottom:25px;
+    border-radius:12px;
+    box-shadow:0 0 10px rgba(0,0,0,0.08);
+}
+
+.photo{
+    width:100%;
+    max-height:300px;
+    object-fit:cover;
+    border-radius:10px;
+    margin-bottom:15px;
+}
+
+.form-box{
+    width:500px;
+    margin:auto;
+    background:white;
+    padding:30px;
+    border-radius:12px;
+    box-shadow:0 0 10px rgba(0,0,0,0.08);
+}
+
+input, textarea{
+    width:100%;
+    padding:12px;
+    margin-bottom:15px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    box-sizing:border-box;
+}
+
+button, .btn{
+    background:#007bff;
+    color:white;
+    padding:12px 18px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    text-decoration:none;
+    display:inline-block;
+}
+
+button:hover, .btn:hover{
+    background:#0056b3;
+}
+
+.msg{
+    background:#d4edda;
+    color:#155724;
+    padding:12px;
+    margin-bottom:20px;
+    border-radius:8px;
+}
