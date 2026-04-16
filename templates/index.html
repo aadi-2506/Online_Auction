@@ -22,7 +22,7 @@
     <p><b>Status:</b> {{ item.status }}</p>
 
     {% if item.status == 'Active' %}
-        <p><b>Ends:</b> {{ item.end_time }}</p>
+        <p><b>Ends At:</b> {{ item.end_time.strftime('%d-%m-%Y %I:%M %p') }}</p>
     {% endif %}
 
     <a href="/auction/{{ item.id }}" class="btn">Open Auction</a>
