@@ -4,11 +4,10 @@ from flask_login import LoginManager, UserMixin, login_user, logout_user, login_
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
-from zoneinfo import ZoneInfo
 import os
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = "secretkey"
+app.config["SECRET_KEY"] = "secretkey123"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///auction.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["UPLOAD_FOLDER"] = "static/uploads"
@@ -19,8 +18,6 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
 
-IST = ZoneInfo("Asia/Kolkata")
-
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
@@ -28,14 +25,14 @@ class User(UserMixin, db.Model):
 
 class Auction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(200))
-    description = db.Column(db.String(500))
-    image = db.Column(db.String(200))
-    start_price = db.Column(db.Float)
-    highest_bid = db.Column(db.Float)
-    highest_bidder = db.Column(db.String(100))
-    seller = db.Column(db.String(100))
-    end_time = db.Column(db.DateTime)
+    title = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.String(500), nullable=False)
+    image = db.Column(db.String(200), nullable=False)
+    start_price = db.Column(db.Float, nullable=False)
+    highest_bid = db.Column(db.Float, nullable=False)
+    highest_bidder = db.Column(db.String(100), default="No bids")
+    seller = db.Column(db.String(100), nullable=False)
+    end_time = db.Column(db.DateTime, nullable=False)
     extended = db.Column(db.Boolean, default=False)
     status = db.Column(db.String(20), default="Active")
 
@@ -43,22 +40,17 @@ class Auction(db.Model):
 def load_user(user_id):
     return db.session.get(User, int(user_id))
 
-def now_ist():
-    return datetime.now(IST).replace(tzinfo=None)
+def update_status():
+    now = datetime.now()
+    items = Auction.query.filter_by(status="Active").all()
+    for item in items:
+        if now >= item.end_time:
+            item.status = "Ended"
+    db.session.commit()
 
 with app.app_context():
     os.makedirs("static/uploads", exist_ok=True)
     db.create_all()
-
-def update_status():
-    items = Auction.query.filter_by(status="Active").all()
-    now = now_ist()
-
-    for item in items:
-        if now >= item.end_time:
-            item.status = "Ended"
-
-    db.session.commit()
 
 @app.route("/")
 def home():
@@ -118,12 +110,11 @@ def add_item():
         file = request.files["image"]
 
         if file.filename == "":
-            flash("Please select image")
+            flash("Select image")
             return redirect(url_for("add_item"))
 
         filename = secure_filename(file.filename)
-        filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
-        file.save(filepath)
+        file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
 
         price = float(request.form["price"])
         minutes = int(request.form["minutes"])
@@ -136,28 +127,27 @@ def add_item():
             highest_bid=price,
             highest_bidder="No bids",
             seller=current_user.username,
-            end_time=now_ist() + timedelta(minutes=minutes),
-            status="Active"
+            end_time=datetime.now() + timedelta(minutes=minutes)
         )
 
         db.session.add(item)
         db.session.commit()
 
-        flash("Auction item posted successfully")
+        flash("Auction created")
         return redirect(url_for("home"))
 
     return render_template("add_item.html")
 
-@app.route("/auction/<int:id>", methods=["GET", "POST"])
+@app.route("/auction/<int:item_id>", methods=["GET", "POST"])
 @login_required
-def auction(id):
+def auction(item_id):
     update_status()
-    item = Auction.query.get_or_404(id)
+    item = Auction.query.get_or_404(item_id)
 
     if request.method == "POST":
         if item.status == "Ended":
             flash("Auction ended")
-            return redirect(url_for("auction", id=id))
+            return redirect(url_for("auction", item_id=item.id))
 
         bid = float(request.form["bid"])
 
@@ -169,14 +159,14 @@ def auction(id):
         else:
             flash("Bid must be higher than current highest bid")
 
-        return redirect(url_for("auction", id=id))
+        return redirect(url_for("auction", item_id=item.id))
 
     return render_template("auction.html", item=item)
 
-@app.route("/extend/<int:id>")
+@app.route("/extend/<int:item_id>")
 @login_required
-def extend(id):
-    item = Auction.query.get_or_404(id)
+def extend(item_id):
+    item = Auction.query.get_or_404(item_id)
 
     if item.seller == current_user.username and item.extended == False and item.status == "Active":
         item.end_time = item.end_time + timedelta(minutes=5)
@@ -184,7 +174,7 @@ def extend(id):
         db.session.commit()
         flash("Auction extended by 5 minutes")
 
-    return redirect(url_for("auction", id=id))
+    return redirect(url_for("auction", item_id=item.id))
 
 @app.route("/logout")
 @login_required
@@ -194,4 +184,4 @@ def logout():
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=True)
+    app.run(host="0.0.0.0", port=port)
