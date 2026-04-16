@@ -40,6 +40,10 @@ class Auction(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+with app.app_context():
+    os.makedirs("static/uploads", exist_ok=True)
+    db.create_all()
+
 def update_status():
     items = Auction.query.filter_by(status="Active").all()
     now = datetime.now()
