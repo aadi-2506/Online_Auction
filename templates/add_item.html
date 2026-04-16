@@ -3,6 +3,7 @@
 {% block content %}
 
 <div class="form-box">
+
 <h1>Post Item for Auction</h1>
 
 <form method="POST" enctype="multipart/form-data">
@@ -13,13 +14,14 @@
 
     <input type="number" step="0.01" name="price" placeholder="Starting Price" required>
 
-    <input type="number" name="minutes" placeholder="Auction Time (minutes)" required>
+    <input type="number" name="minutes" placeholder="Auction Time (Minutes)" required>
 
     <input type="file" name="image" accept="image/*" required>
 
-    <button type="submit">Post Item</button>
+    <button type="submit">Post Auction</button>
 
 </form>
+
 </div>
 
 {% endblock %}
