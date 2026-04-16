@@ -11,19 +11,16 @@
 <p>{{ item.description }}</p>
 
 <p><b>Seller:</b> {{ item.seller }}</p>
-
 <p><b>Status:</b> {{ item.status }}</p>
-
 <p><b>Highest Bid:</b> ₹{{ item.highest_bid }}</p>
-
 <p><b>Highest Bidder:</b> {{ item.highest_bidder }}</p>
 
-{% if item.status == 'Active' %}
+{% if item.status == "Active" %}
 
 <p><b>Ends:</b> {{ item.end_time }}</p>
 
 <form method="POST">
-    <input type="number" step="0.01" name="bid" placeholder="Enter Bid" required>
+    <input type="number" step="0.01" name="bid" placeholder="Enter Bid Amount" required>
     <button type="submit">Place Bid</button>
 </form>
 
