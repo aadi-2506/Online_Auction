@@ -35,7 +35,7 @@ class Auction(db.Model):
     highest_bid = db.Column(db.Float)
     highest_bidder = db.Column(db.String(100))
     seller = db.Column(db.String(100))
-    end_time = db.Column(db.DateTime(timezone=True))
+    end_time = db.Column(db.DateTime)
     extended = db.Column(db.Boolean, default=False)
     status = db.Column(db.String(20), default="Active")
 
@@ -43,12 +43,12 @@ class Auction(db.Model):
 def load_user(user_id):
     return db.session.get(User, int(user_id))
 
+def now_ist():
+    return datetime.now(IST).replace(tzinfo=None)
+
 with app.app_context():
     os.makedirs("static/uploads", exist_ok=True)
     db.create_all()
-
-def now_ist():
-    return datetime.now(IST)
 
 def update_status():
     items = Auction.query.filter_by(status="Active").all()
@@ -125,8 +125,8 @@ def add_item():
         filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
         file.save(filepath)
 
-        minutes = int(request.form["minutes"])
         price = float(request.form["price"])
+        minutes = int(request.form["minutes"])
 
         item = Auction(
             title=request.form["title"],
@@ -143,7 +143,7 @@ def add_item():
         db.session.add(item)
         db.session.commit()
 
-        flash("Auction item posted")
+        flash("Auction item posted successfully")
         return redirect(url_for("home"))
 
     return render_template("add_item.html")
@@ -178,11 +178,7 @@ def auction(id):
 def extend(id):
     item = Auction.query.get_or_404(id)
 
-    if (
-        item.seller == current_user.username
-        and item.extended == False
-        and item.status == "Active"
-    ):
+    if item.seller == current_user.username and item.extended == False and item.status == "Active":
         item.end_time = item.end_time + timedelta(minutes=5)
         item.extended = True
         db.session.commit()
